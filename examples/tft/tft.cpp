@@ -64,13 +64,27 @@ void renderLastNotification()
     tft.setTextColor(TFT_ORANGE);
     tft.setTextFont(1);
     tft.setTextSize(3);
-    tft.drawString(lastNotification, 20, 80);
+    tft.drawString(lastNotification, 20, 70);
 
     if (lastSubNotification != "")
     {
         tft.setTextColor(TFT_WHITE);
         tft.setTextSize(2);
-        tft.drawString(lastSubNotification, 20, 110);
+        int maxChar = 20; // if more than 20 characters, split the text in two lines
+        if (lastSubNotification.length() > maxChar)
+        {
+            tft.drawString(lastSubNotification.substring(0, maxChar), 20, 100);
+            // if first char is space, remove it
+            if (lastSubNotification[maxChar] == ' ')
+            {
+                maxChar++;
+            }
+            tft.drawString(lastSubNotification.substring(maxChar), 20, 120);
+        }
+        else
+        {
+            tft.drawString(lastSubNotification, 20, 110);
+        }
     }
 }
 
@@ -159,7 +173,6 @@ String dataCallbackSource = "";
 String dataCallbackMessage = "";
 String dataCallbackDate = "";
 
-
 class MySecurity : public BLESecurityCallbacks
 {
 
@@ -212,9 +225,10 @@ static void dataSourceNotifyCallback(
     for (int i = 0; i < length; i++)
     {
         if (i > 7)
-        {   
+        {
             // skip non-ascii characters
-            if (pData[i] < 32 || pData[i] > 126){
+            if (pData[i] < 32 || pData[i] > 126)
+            {
                 continue;
             }
 
@@ -226,26 +240,25 @@ static void dataSourceNotifyCallback(
             Serial.print(" ");
         }*/
     }
-    if (message.startsWith("com.")){
+    if (message.startsWith("com."))
+    {
         dataCallbackSource = message;
     }
-    else if (message.startsWith("20")){
+    else if (message.startsWith("20"))
+    {
         dataCallbackDate = message;
     }
-    else{
+    else
+    {
         dataCallbackMessage = message;
     }
 
-    if (dataCallbackSource != "" && dataCallbackMessage != "" && dataCallbackDate != ""){
-        int maxLen = 20;
-        if (dataCallbackMessage.length() > maxLen){
-            dataCallbackMessage = dataCallbackMessage.substring(0, maxLen) + "...";
-        }
-        // source has x.x.x format so we need to extract the middle part
-        int firstDot = dataCallbackSource.indexOf(".");
-        int secondDot = dataCallbackSource.indexOf(".", firstDot + 1);
-        String source = dataCallbackSource.substring(firstDot + 1, secondDot);
-        handleNotify(source, dataCallbackMessage);
+    if (dataCallbackSource != "" && dataCallbackMessage != "" && dataCallbackDate != "")
+    {
+        // source has x.x.x format so we need to extract the last part
+        int lastDot = dataCallbackSource.lastIndexOf(".");
+        dataCallbackSource = dataCallbackSource.substring(lastDot + 1);
+        handleNotify(dataCallbackSource, dataCallbackMessage);
 
         dataCallbackSource = "";
         dataCallbackMessage = "";
@@ -312,7 +325,6 @@ static void NotificationSourceNotifyCallback(
         default:
             break;
         }
-        
     }
     else if (pData[0] == 1)
     {
@@ -411,8 +423,6 @@ class MyClient : public Task
                 const uint8_t vDate[] = {0x0, latestMessageID[0], latestMessageID[1], latestMessageID[2], latestMessageID[3], 0x5};
                 pControlPointCharacteristic->writeValue((uint8_t *)vDate, 6, true);
                 Serial.println(pControlPointCharacteristic->toString().c_str());
-
-
 
                 pendingNotification = false;
             }
