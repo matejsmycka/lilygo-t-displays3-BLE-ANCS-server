@@ -173,7 +173,6 @@ void setup()
     }
 
     configTime(gmtOffset_sec, daylightOffset_sec, ntpServer);
-    server.begin();
     
 }
 
