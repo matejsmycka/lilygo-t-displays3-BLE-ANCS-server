@@ -3,7 +3,6 @@
 #include "pin_config.h"
 #include "time.h"
 #include <WiFi.h>
-#include <ESPAsyncWebServer.h>
 
 // WiFi and NTP configurations
 const char *ssid = "Smyckovi";
@@ -13,7 +12,6 @@ const char *ntpServer = "pool.ntp.org";
 String lastNotification = "";
 String lastSubNotification = "";
 
-AsyncWebServer server(80);
 
 const long gmtOffset_sec = 3600; // GMT+1
 const int daylightOffset_sec = 3600;
@@ -174,19 +172,9 @@ void setup()
         delay(500);
     }
 
-    server.on("/notify", HTTP_GET, [](AsyncWebServerRequest *request)
-              {
-        String message = request->arg("message");
-        String submessage = request->arg("submessage");
-        handleNotify(message, submessage);
-        request->send(200); });
-
-    server.on("/", HTTP_GET, [](AsyncWebServerRequest *request)
-              { request->send(200, "text/plain", "Working!"); });
-
-    // Configure time from NTP server
     configTime(gmtOffset_sec, daylightOffset_sec, ntpServer);
     server.begin();
+    
 }
 
 void loop()
