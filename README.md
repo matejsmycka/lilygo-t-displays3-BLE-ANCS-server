@@ -2,6 +2,8 @@
 
 This is ESP32-S3 based BLE ANCS server. Build it with PlatformIO and upload to board, then you can connect to it with your phone and receive notifications from it. Code is based on https://github.com/gabrielchristino/ANCS.
 
+You can control brightness of the screen with the BOT button.
+
 ![showcase.jpg](showcase.jpg)
 
 ## Tested hardware
