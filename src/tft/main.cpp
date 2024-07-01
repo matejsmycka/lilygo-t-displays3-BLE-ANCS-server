@@ -1,3 +1,4 @@
+
 #include "Arduino.h"
 #include "TFT_eSPI.h"
 #include "pin_config.h"
@@ -10,8 +11,8 @@
 #include "Task.h"
 
 // WiFi and NTP configurations
-const char *ssid = "Smyckovi";
-const char *password = "smyckovi";
+const char *ssid = "Smyckovi";  // Your WiFi SSID
+const char *password = "smyckovi"; // Your WiFi password
 const char *ntpServer = "pool.ntp.org";
 
 String lastNotification = "";
@@ -70,15 +71,21 @@ void renderLastNotification()
     {
         tft.setTextColor(TFT_WHITE);
         tft.setTextSize(2);
-        int maxChar = 20; // if more than 20 characters, split the text in two lines
+        int maxChar = 22; // if more than 20 characters, split the text in two lines
         if (lastSubNotification.length() > maxChar)
         {
             tft.drawString(lastSubNotification.substring(0, maxChar), 20, 100);
-            // if first char is space, remove it
-            if (lastSubNotification[maxChar] == ' ')
+            String secondLine = lastSubNotification.substring(maxChar);
+            // if first char is space, remove it and also if longer than max replace with ...
+            if (secondLine.charAt(0) == ' ')
             {
-                maxChar++;
+                secondLine = secondLine.substring(1);
             }
+            if (secondLine.length() > maxChar)
+            {
+                secondLine = secondLine.substring(0, maxChar - 3) + "...";
+            }
+    
             tft.drawString(lastSubNotification.substring(maxChar), 20, 120);
         }
         else
